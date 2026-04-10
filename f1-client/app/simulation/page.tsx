@@ -8,10 +8,11 @@ import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 import { getCircuits, Circuit } from "../apis/ui_options";
 import { Button } from "@mui/material";
 import { useFeatures } from "../contexts/featuresContext";
+import Track from "./Track";
 
 export default function Simulator() {
   const [circuits, setCircuits] = useState<Circuit[]>([]);
@@ -46,14 +47,7 @@ export default function Simulator() {
         <div className="h-full flex flex-col gap-10">
           <div className="h-3/4 gap-2">
             {/* Track Map */}
-            <h2 className="text-2xl font-bold">Track Map</h2>
-            <Image
-              src="/track.jpg"
-              alt="track"
-              width={500}
-              height={500}
-              className="w-auto h-full"
-            />
+            <Track />
           </div>
           <div className="flex flex-col gap-2">
             {/* User Controls */}
