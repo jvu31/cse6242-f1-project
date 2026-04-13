@@ -1,32 +1,6 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-
 import { Box, Grid, Button } from "@mui/material";
-import { styled } from '@mui/material/styles';
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: (theme.vars ?? theme).palette.text.secondary,
-  ...theme.applyStyles('dark', {
-    backgroundColor: '#1A2027',
-  }),
-}));
-
-const stylesRect = {
-  rectangle: {
-    width: '100px',
-    height: '100px',
-    fill: '#f81919',
-  }
-}
+import { ThemeProvider } from "@mui/material/styles";
+import customTheme from "../customTheme";
 
 function createData(
   name: string,
@@ -48,33 +22,81 @@ const rows = [
 export default function Podium() {
   return (
     <>
-      <Grid
+      <ThemeProvider theme={customTheme}>
+        <Grid
         container
         direction="row"
+        spacing={{ xs: 1, md: 1 }} 
+        columns={{ xs: 3, sm: 9, md: 12 }}
         sx={{
           justifyContent: "center",
           alignItems: "flex-end",
         }}
       >
-          <Grid size = {2}>
-            <Item>2nd</Item>
+          <Grid size={{ xs: 1, sm: 3, md: 4 }} sx={{
+            textAlign: "center"
+          }}>
+            <div>
+              <text>[2nd Place]</text>
+              <Box
+                sx={{
+                  width: 144,
+                  height: 180,
+                  borderRadius: 1,
+                  bgcolor: "base.100",
+                  margin: "auto"
+                }}>
+                <img
+                  src="/2nd.png"
+                  alt="2nd"
+                  width="auto"
+                  height="auto"
+                />
+              </Box>
+            </div>
           </Grid>
-          <Grid size = {2}>
-            <Item>1st</Item>
+          <Grid size={{ xs: 1, sm: 3, md: 4 }} sx={{
+            textAlign: "center"
+          }}>
+            <text>[1st Place]</text>
+            <Box
+                sx={{
+                  width: 144,
+                  height: 236,
+                  borderRadius: 1,
+                  bgcolor: "base.100",
+                  margin: "auto"
+                }}>
+                <img
+                  src="/1st.png"
+                  alt="1st"
+                  width="auto"
+                  height="auto"
+                />
+              </Box>
           </Grid>
-          <Grid size = {2}>
-            <Item>3rd</Item>
+          <Grid size={{ xs: 1, sm: 3, md: 4 }} sx={{
+            textAlign: "center"
+          }}>
+            <text>[3rd Place]</text>
+            <Box
+                sx={{
+                  width: 144,
+                  height: 140,
+                  borderRadius: 1,
+                  bgcolor: "base.100",
+                  margin: "auto"
+                }}>
+                <img
+                  src="/3rd.png"
+                  alt="3rd"
+                  width="auto"
+                  height="auto"
+                />
+              </Box>
+          </Grid>
         </Grid>
-
-      </Grid>
-    
-    
-    
-    
-    
-    
+      </ThemeProvider>
     </>
-
-
   );
 }

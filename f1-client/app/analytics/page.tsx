@@ -13,6 +13,7 @@ import { useFeatures } from "../contexts/featuresContext";
 import { Pallet } from "@mui/icons-material";
 import TimeTable from "../components/TimeTable";
 import Podium from "../components/Podium";
+import CoefficintMatrix from "../components/CoefficintMatrix";
 
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
@@ -46,7 +47,7 @@ export default function Analytics() {
                 <Podium/>
             </Grid>
             <Grid size={6}>
-                <Item>Coefficient Matrix</Item>
+                <CoefficintMatrix/>
             </Grid>
             <Grid size={6}>
                 <TimeTable/>
