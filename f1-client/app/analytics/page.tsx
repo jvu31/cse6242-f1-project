@@ -14,6 +14,7 @@ import { Pallet } from "@mui/icons-material";
 import TimeTable from "../components/TimeTable";
 import Podium from "../components/Podium";
 import CoefficintMatrix from "../components/CoefficintMatrix";
+import Statistics from "../components/Statistics";
 
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
@@ -53,7 +54,7 @@ export default function Analytics() {
                 <TimeTable/>
             </Grid>
             <Grid size={6}>
-                <Item>Model Statistics (f1 stat)</Item>
+                <Statistics/>
             </Grid>
             </Grid>
     

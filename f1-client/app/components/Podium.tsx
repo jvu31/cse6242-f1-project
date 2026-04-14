@@ -1,4 +1,5 @@
 import { Box, Grid, Button } from "@mui/material";
+import Stack from '@mui/material/Stack';
 import { ThemeProvider } from "@mui/material/styles";
 import customTheme from "../customTheme";
 
@@ -32,69 +33,70 @@ export default function Podium() {
           justifyContent: "center",
           alignItems: "flex-end",
         }}
-      >
-          <Grid size={{ xs: 1, sm: 3, md: 4 }} sx={{
-            textAlign: "center"
+        >
+          <Stack spacing={1} sx={{
+            justifyContent: "flex-end",
+            alignItems: "center",
           }}>
-            <div>
-              <text>[2nd Place]</text>
-              <Box
-                sx={{
-                  width: 144,
-                  height: 180,
-                  borderRadius: 1,
-                  bgcolor: "base.100",
-                  margin: "auto"
-                }}>
-                <img
-                  src="/2nd.png"
-                  alt="2nd"
-                  width="auto"
-                  height="auto"
-                />
-              </Box>
-            </div>
-          </Grid>
-          <Grid size={{ xs: 1, sm: 3, md: 4 }} sx={{
-            textAlign: "center"
+            <text>[2nd Place]</text>
+            <Box
+              sx={{
+                width: 144,
+                height: 180,
+                borderRadius: 1,
+                bgcolor: "base.100",
+                margin: "auto"
+              }}>
+              <img
+                src="/2nd.png"
+                alt="2nd"
+                width="auto"
+                height="auto"
+              />
+            </Box>
+          </Stack>
+          <Stack spacing={1} sx={{
+            justifyContent: "flex-end",
+            alignItems: "center",
           }}>
             <text>[1st Place]</text>
             <Box
-                sx={{
-                  width: 144,
-                  height: 236,
-                  borderRadius: 1,
-                  bgcolor: "base.100",
-                  margin: "auto"
-                }}>
-                <img
-                  src="/1st.png"
-                  alt="1st"
-                  width="auto"
-                  height="auto"
-                />
-              </Box>
-          </Grid>
-          <Grid size={{ xs: 1, sm: 3, md: 4 }} sx={{
-            textAlign: "center"
+              sx={{
+                width: 144,
+                height: 236,
+                borderRadius: 1,
+                bgcolor: "base.100",
+                margin: "auto"
+              }}>
+              <img
+                src="/1st.png"
+                alt="1st"
+                width="auto"
+                height="auto"
+              />
+            </Box>
+          </Stack>
+          <Stack spacing={1} sx={{
+            justifyContent: "flex-end",
+            alignItems: "center",
           }}>
             <text>[3rd Place]</text>
             <Box
-                sx={{
-                  width: 144,
-                  height: 140,
-                  borderRadius: 1,
-                  bgcolor: "base.100",
-                  margin: "auto"
-                }}>
-                <img
-                  src="/3rd.png"
-                  alt="3rd"
-                  width="auto"
-                  height="auto"
-                />
-              </Box>
-          </Grid>
+              sx={{
+                width: 144,
+                height: 140,
+                borderRadius: 1,
+                bgcolor: "base.100",
+                margin: "auto"
+              }}>
+              <img
+                src="/3rd.png"
+                alt="3rd"
+                width="auto"
+                height="auto"
+              />
+            </Box>
+          </Stack>
         </Grid>
       </ThemeProvider>
     </>
