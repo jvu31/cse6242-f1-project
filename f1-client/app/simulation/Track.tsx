@@ -1,16 +1,13 @@
 import { motion } from "framer-motion";
-import { get } from "http";
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import { getPredictions } from "../apis/ui_options";
 import { useFeatures } from "../contexts/featuresContext";
-import { useDrivers } from "../contexts/driversContext";
-
+//import { useDrivers } from "../contexts/driversContext";
 
 interface GridTrack {
   grid_position: number;
   path: string;
 }
-
 
 /* Witchcraft math for svgs idk */
 const GridTracks: GridTrack[] = [
@@ -43,39 +40,46 @@ const getStartPoint = (path: string) => {
   return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
 };
 
-
-export default function Track({ simulationCount, type }: { simulationCount: number, type: string }) {
+export default function Track({
+  simulationCount,
+  type,
+}: {
+  simulationCount: number;
+  type: string;
+}) {
   const SMALL_OFFSET_X = (1132 - 1000) / 2;
   const SMALL_OFFSET_Y = (455 - 370) / 2;
 
-
-  const [data, setData] = useState<any>()
+  const [data, setData] = useState<any>();
 
   const { features } = useFeatures();
   //const { drivers } = useDrivers();
 
-  const [driverProbabilities, setDriverProbabilities] = useState<any[]>([])
+  const [driverProbabilities, setDriverProbabilities] = useState<any[]>([]);
 
   //const [joinedData, setJoinedData] = useState<any[]>([])
 
-  const [tooltip, setTooltip] = useState<{ name: string; grid: number; probability: number; x: number; y: number } | null>(null)
+  const [tooltip, setTooltip] = useState<{
+    name: string;
+    grid: number;
+    probability: number;
+    x: number;
+    y: number;
+  } | null>(null);
 
   useEffect(() => {
-    getPredictions().then((data) => setData(data))
-  }, [])
+    getPredictions().then((data) => setData(data));
+  }, []);
 
   useEffect(() => {
     if (!data) return;
-    const drivers = data.historical_records
-      .filter(
-        (r: any) =>
-          r.circuit_name === features.circuit &&
-          r.year === features.year
-      )
+    const drivers = data.historical_records.filter(
+      (r: any) =>
+        r.circuit_name === features.circuit && r.year === features.year,
+    );
     setDriverProbabilities(drivers);
     //console.log("drivers", drivers);
-    
-  }, [data, features.circuit, features.year])
+  }, [data, features.circuit, features.year]);
 
   /*
   useEffect(() => {
@@ -98,13 +102,6 @@ export default function Track({ simulationCount, type }: { simulationCount: numb
 
   }, [driverProbabilities, drivers])*/
 
-
-  
-
-
-
-
-
   return (
     <div className="h-full">
       <h2 className="text-2xl font-bold">Track Map</h2>
@@ -116,7 +113,9 @@ export default function Track({ simulationCount, type }: { simulationCount: numb
         >
           <div className="font-semibold">{tooltip.name}</div>
           <div>Grid: {tooltip.grid}</div>
-          <div>Podium probability: {(tooltip.probability * 100).toFixed(1)}%</div>
+          <div>
+            Podium probability: {(tooltip.probability * 100).toFixed(1)}%
+          </div>
         </div>
       )}
 
@@ -127,7 +126,9 @@ export default function Track({ simulationCount, type }: { simulationCount: numb
 
             const isOdd = gridTrack.grid_position % 2 !== 0;
 
-            const currentDriver = driverProbabilities.find((d) => d.start_position === gridTrack.grid_position);
+            const currentDriver = driverProbabilities.find(
+              (d) => d.start_position === gridTrack.grid_position,
+            );
 
             const t = (gridTrack.grid_position - 1) / 19;
             const hue = 120 * (1 - t);
@@ -162,7 +163,14 @@ export default function Track({ simulationCount, type }: { simulationCount: numb
                       initial={{ pathLength: 0 }}
                       animate={{ pathLength: 1 || 0 }}
                       transition={{
-                        duration: 60 * (currentDriver ? (2 - (type === "simulation" ? currentDriver.podium_probability : (20 - currentDriver.finish_position) / 19)) : 1),
+                        duration:
+                          60 *
+                          (currentDriver
+                            ? 2 -
+                              (type === "simulation"
+                                ? currentDriver.podium_probability
+                                : (20 - currentDriver.finish_position) / 19)
+                            : 1),
                       }}
                     />
 
@@ -181,7 +189,14 @@ export default function Track({ simulationCount, type }: { simulationCount: numb
                       initial={{ offsetDistance: "0%" }}
                       animate={{ offsetDistance: "100%" }}
                       transition={{
-                        duration: 60 * (currentDriver ? (2 - (type === "simulation" ? currentDriver.podium_probability : (20 - currentDriver.finish_position) / 19)) : 1),
+                        duration:
+                          60 *
+                          (currentDriver
+                            ? 2 -
+                              (type === "simulation"
+                                ? currentDriver.podium_probability
+                                : (20 - currentDriver.finish_position) / 19)
+                            : 1),
                       }}
                       onMouseEnter={(e) => {
                         if (!currentDriver) return;
