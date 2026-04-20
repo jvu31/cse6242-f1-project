@@ -13,17 +13,40 @@ import { getCircuits, Circuit } from "../apis/ui_options";
 import { Button } from "@mui/material";
 import { useFeatures } from "../contexts/featuresContext";
 import Track from "./Track";
+import { getPredictions } from "../apis/ui_options";
 
 export default function Simulator() {
   const [circuits, setCircuits] = useState<Circuit[]>([]);
   const [selectedCircuit, setSelectedCircuit] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<number | "">("");
+  const { setFeatures, getFeatures } = useFeatures();
+  const [simulationCount, setSimulationCount] = useState(0);
+  const [bundle, setBundle] = useState<any>();
+  const [isValid, setIsValid] = useState(false);
 
-  const { setFeatures, getFeatures} = useFeatures();
+  const [type, setType] = useState("simulation");
 
   useEffect(() => {
     getCircuits().then((data) => setCircuits(data));
+    getPredictions().then((data) => setBundle(data));
   }, []);
+
+  useEffect(() => {
+    if (selectedCircuit === "" || selectedYear === "") {
+      setIsValid(false);
+      return;
+    }
+
+    const races = bundle?.historical_records.filter(
+      (r: any) => r.circuit_name === selectedCircuit && r.year === selectedYear,
+    );
+
+    if (races.length > 0) {
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
+  }, [selectedYear, selectedCircuit]);
 
   return (
     <div
@@ -47,7 +70,7 @@ export default function Simulator() {
         <div className="h-full flex flex-col gap-10">
           <div className="h-3/4 gap-2">
             {/* Track Map */}
-            <Track />
+            <Track simulationCount={simulationCount} type={type} />
           </div>
           <div className="flex flex-col gap-2">
             {/* User Controls */}
@@ -83,7 +106,9 @@ export default function Simulator() {
                     <InputLabel id="demo-simple-select-label">Year</InputLabel>
                     <Select
                       value={selectedYear}
-                      onChange={(event) => setSelectedYear(event.target.value as number)}
+                      onChange={(event) =>
+                        setSelectedYear(event.target.value as number)
+                      }
                       label="Year"
                     >
                       {Array.from({ length: 75 }, (_, i) => 2024 - i).map(
@@ -97,13 +122,39 @@ export default function Simulator() {
                   </FormControl>
                 </Box>
               </div>
-              <Button variant="contained" color="accent" onClick={() => {
-                if (selectedYear !== "" && selectedCircuit !== "") {
-                  setFeatures({ circuit: selectedCircuit, year: selectedYear as number });
-                }
-              }}>
-                Simulate
-              </Button>
+              {/* Buttons */}
+              <div className="flex flex-row gap-4">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  disabled={!isValid}
+                  onClick={() => {
+                    setFeatures({
+                      circuit: selectedCircuit,
+                      year: selectedYear as number,
+                    });
+                    setSimulationCount((c) => c + 1);
+                    setType("real");
+                  }}
+                >
+                  Real Results
+                </Button>
+                <Button
+                  variant="contained"
+                  color="accent"
+                  disabled={!isValid}
+                  onClick={() => {
+                    setFeatures({
+                      circuit: selectedCircuit,
+                      year: selectedYear as number,
+                    });
+                    setSimulationCount((c) => c + 1);
+                    setType("simulation");
+                  }}
+                >
+                  Simulated Results
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -1,4 +1,10 @@
 import { motion } from "framer-motion";
+import { get } from "http";
+import { use, useEffect, useState } from "react"
+import { getPredictions } from "../apis/ui_options";
+import { useFeatures } from "../contexts/featuresContext";
+import { useDrivers } from "../contexts/driversContext";
+
 
 interface GridTrack {
   grid_position: number;
@@ -7,7 +13,6 @@ interface GridTrack {
 
 
 /* Witchcraft math for svgs idk */
-
 const GridTracks: GridTrack[] = [
   { grid_position: 2, path: "M854 385.5 H1068 V50 H0 V385.5 H190" },
   { grid_position: 4, path: "M783 385.5 H1068 V50 H0 V385.5 H190" },
@@ -38,32 +43,96 @@ const getStartPoint = (path: string) => {
   return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
 };
 
-interface RaceProbabilities {
-  driver: string,
-  position: number,
-  probability: number,
-}
 
-const RaceProbabilities: RaceProbabilities[] = [
-  { driver: "Driver A", position: 1, probability: 0.32 },
-  { driver: "Driver B", position: 2, probability: 0.90 },
-  { driver: "Driver C", position: 3, probability: 0.78 },
-  { driver: "Driver D", position: 4, probability: 0.87 },
-  { driver: "Driver E", position: 5, probability: 0.40 },
-]
-
-export default function Track() {
+export default function Track({ simulationCount, type }: { simulationCount: number, type: string }) {
   const SMALL_OFFSET_X = (1132 - 1000) / 2;
   const SMALL_OFFSET_Y = (455 - 370) / 2;
+
+
+  const [data, setData] = useState<any>()
+
+  const { features } = useFeatures();
+  //const { drivers } = useDrivers();
+
+  const [driverProbabilities, setDriverProbabilities] = useState<any[]>([])
+
+  //const [joinedData, setJoinedData] = useState<any[]>([])
+
+  const [tooltip, setTooltip] = useState<{ name: string; grid: number; probability: number; x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    getPredictions().then((data) => setData(data))
+  }, [])
+
+  useEffect(() => {
+    if (!data) return;
+    const drivers = data.historical_records
+      .filter(
+        (r: any) =>
+          r.circuit_name === features.circuit &&
+          r.year === features.year
+      )
+    setDriverProbabilities(drivers);
+    //console.log("drivers", drivers);
+    
+  }, [data, features.circuit, features.year])
+
+  /*
+  useEffect(() => {
+    if (driverProbabilities.length === 0 || Object.keys(drivers).length === 0) return;
+
+    const joined = driverProbabilities
+      .map((dp) => {
+        const driverInfo = Object.values(drivers).find((d) => d.driverId === dp.driver_id);
+        if (!driverInfo) return null;
+        return {
+          grid_position: dp.position,
+          probability: dp.probability,
+          driver_name: `${driverInfo.forename} ${driverInfo.surname}`,
+        };
+      })
+      .filter((dp) => dp !== null);
+    
+    setJoinedData(joined);
+    
+
+  }, [driverProbabilities, drivers])*/
+
+
+  
+
+
+
+
+
   return (
     <div className="h-full">
       <h2 className="text-2xl font-bold">Track Map</h2>
+
+      {tooltip && (
+        <div
+          style={{ top: tooltip.y + 12, left: tooltip.x + 12 }}
+          className="fixed z-50 pointer-events-none bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm text-white shadow-lg"
+        >
+          <div className="font-semibold">{tooltip.name}</div>
+          <div>Grid: {tooltip.grid}</div>
+          <div>Podium probability: {(tooltip.probability * 100).toFixed(1)}%</div>
+        </div>
+      )}
+
       <div className="flex items-center justify-center h-full">
         <div className="relative">
           {GridTracks.map((gridTrack, index) => {
             const { x, y } = getStartPoint(gridTrack.path);
 
             const isOdd = gridTrack.grid_position % 2 !== 0;
+
+            const currentDriver = driverProbabilities.find((d) => d.start_position === gridTrack.grid_position);
+
+            const t = (gridTrack.grid_position - 1) / 19;
+            const hue = 120 * (1 - t);
+            const lightness = 60 - 15 * t;
+            const circleColor = `hsl(${hue}, 85%, ${lightness}%)`;
 
             return (
               <div key={gridTrack.grid_position}>
@@ -73,6 +142,7 @@ export default function Track() {
                   viewBox="0 0 1132 455"
                   fill="none"
                   className={index === 0 ? "relative" : "absolute inset-0"}
+                  style={{ pointerEvents: "none" }}
                 >
                   <g
                     transform={
@@ -83,18 +153,47 @@ export default function Track() {
                   >
                     {/* Line*/}
                     <motion.path
+                      key={`path-${simulationCount}-${type}`}
                       d={gridTrack.path}
                       fill="transparent"
                       strokeWidth="2"
                       stroke="rgba(255,255,255,0.7)"
                       strokeLinecap="round"
                       initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
+                      animate={{ pathLength: 1 || 0 }}
                       transition={{
-                        duration: 20,
-                        ease: [0.22, 1, 0.36, 1],
-                        delay: index * 0.1,
+                        duration: 60 * (currentDriver ? (2 - (type === "simulation" ? currentDriver.podium_probability : (20 - currentDriver.finish_position) / 19)) : 1),
                       }}
+                    />
+
+                    {/* Tracking circle */}
+                    <motion.circle
+                      key={`circle-${simulationCount}-${type}`}
+                      r={10}
+                      fill={circleColor}
+                      filter={`url(#glow-${gridTrack.grid_position})`}
+                      style={{
+                        offsetPath: `path("${gridTrack.path}")`,
+                        offsetRotate: "0deg",
+                        cursor: "pointer",
+                        pointerEvents: "auto",
+                      }}
+                      initial={{ offsetDistance: "0%" }}
+                      animate={{ offsetDistance: "100%" }}
+                      transition={{
+                        duration: 60 * (currentDriver ? (2 - (type === "simulation" ? currentDriver.podium_probability : (20 - currentDriver.finish_position) / 19)) : 1),
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!currentDriver) return;
+                        setTooltip({
+                          name: currentDriver.driver_name,
+                          grid: currentDriver.start_position,
+                          probability: currentDriver.podium_probability,
+                          x: e.clientX,
+                          y: e.clientY,
+                        });
+                      }}
+                      onMouseLeave={() => setTooltip(null)}
                     />
 
                     {/* Label */}
