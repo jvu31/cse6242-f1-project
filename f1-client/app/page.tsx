@@ -6,6 +6,7 @@ import Image from "next/image";
 import Button from "@mui/material/Button";
 import Simulator from "./simulation/page";
 import { useRef } from "react";
+import Analytics from "./analytics/page";
 
 export default function Home() {
 
@@ -43,10 +44,10 @@ export default function Home() {
           <Simulator />
         </section>
 
-
+      
         {/* Analytics */}
-        <section ref={analyticsSection}>
-          <div className="text-base-content text-center">Analytics</div>
+        <section ref={analyticsSection} className="w-full">
+          <Analytics />
         </section>
 
       </main>
