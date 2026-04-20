@@ -2,6 +2,8 @@ import { Box, Grid, Button } from "@mui/material";
 import Stack from '@mui/material/Stack';
 import { ThemeProvider } from "@mui/material/styles";
 import customTheme from "../customTheme";
+import { useState, useEffect } from "react";
+import { useFeatures } from "../contexts/featuresContext"
 
 function createData(
   name: string,
@@ -21,6 +23,7 @@ const rows = [
 ];
 
 export default function Podium() {
+  
   return (
     <>
       <ThemeProvider theme={customTheme}>
