@@ -26,6 +26,7 @@ export interface Circuit {
 
 let driversCache: Driver[] | null = null;
 let circuitCache: Circuit[] | null = null;
+let predictionCache: any[] | null = null
 
 export const getDrivers = async (): Promise<Driver[]> => {
   if (driversCache) return driversCache;
@@ -45,7 +46,6 @@ export const getDrivers = async (): Promise<Driver[]> => {
     });
 
     driversCache = result.data;
-    console.log(result.data);
     return result.data;
   } catch (error) {
     console.error("Error loading drivers:", error);
@@ -71,10 +71,22 @@ export const getCircuits = async (): Promise<Circuit[]> => {
     });
 
     circuitCache = result.data;
-    console.log(result.data);
     return result.data;
   } catch (error) {
     console.error("Error loading drivers:", error);
     return [];
   }
 };
+
+export const getPredictions = async(): Promise<any[]> => {
+  if (predictionCache) return predictionCache
+
+
+
+  predictionCache = await fetch("/data/f1_frontend_bundle.json")
+    .then(res => res.text())
+    .then(text => JSON.parse(text.replace(/:\s*NaN/g, ": null")))
+    .then(json => predictionCache = json)
+
+  return predictionCache!;
+}
