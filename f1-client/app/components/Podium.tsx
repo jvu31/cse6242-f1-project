@@ -4,6 +4,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import customTheme from "../customTheme";
 import { useState, useEffect } from "react";
 import { useFeatures } from "../contexts/featuresContext"
+import { getPredictions } from "../apis/ui_options";
+import { DriversProvider } from "../contexts/driversContext";
 
 function createData(
   name: string,
@@ -23,6 +25,32 @@ const rows = [
 ];
 
 export default function Podium() {
+   //const [bundleData, setBundleData] = useState<BundleData | null>(null);
+    const { features } = useFeatures()
+    // New variables here
+    const [data, setData] = useState<any>();
+    const [driverProbabilities, setDriverProbabilities] = useState<any[]>([]);
+  
+    useEffect(() => {
+      getPredictions().then((data) => setData(data));
+    }, []);
+  
+    useEffect(() => {
+      if (!data) return;
+      const drivers = data.historical_records.filter(
+        (r: any) =>
+          r.circuit_name === features.circuit && r.year === features.year,
+      )
+      .sort((a: any, b: any) => b.podium_probability - a.podium_probability);
+      setDriverProbabilities(drivers);
+      //console.log("drivers", drivers);
+    }, [data, features.circuit, features.year]);
+
+    const podiumNames = driverProbabilities.slice(0,3).map((driver, index) => {
+      return {place: index+1, name: driver.driver_name}
+    })
+
+
   
   return (
     <>
@@ -41,7 +69,7 @@ export default function Podium() {
             justifyContent: "flex-end",
             alignItems: "center",
           }}>
-            <text>[2nd Place]</text>
+            <span>{podiumNames.find(p => p.place === 2)?.name}</span>
             <Box
               sx={{
                 width: 144,
@@ -62,7 +90,7 @@ export default function Podium() {
             justifyContent: "flex-end",
             alignItems: "center",
           }}>
-            <text>[1st Place]</text>
+            <span>{podiumNames.find(p => p.place === 1)?.name}</span>
             <Box
               sx={{
                 width: 144,
@@ -83,7 +111,7 @@ export default function Podium() {
             justifyContent: "flex-end",
             alignItems: "center",
           }}>
-            <text>[3rd Place]</text>
+            <span>{podiumNames.find(p => p.place === 3)?.name}</span>
             <Box
               sx={{
                 width: 144,

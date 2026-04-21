@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState } from "react";
 interface Features {
   circuit: string;
   year: number;
+  model: string;
 }
 
 interface FeaturesContextType {
@@ -14,13 +15,13 @@ interface FeaturesContextType {
 }
 
 const FeaturesContext = createContext<FeaturesContextType>({
-  features: { circuit: "", year: 0 },
+  features: { circuit: "", year: 0, model: "" },
   setFeatures: () => {},
-  getFeatures: () => ({ circuit: "", year: 0 })
+  getFeatures: () => ({ circuit: "", year: 0, model: "" })
 });
 
 export const FeaturesProvider = ({ children }: { children: React.ReactNode }) => {
-  const [features, setFeatures] = useState<Features>({ circuit: "", year: 0 });
+  const [features, setFeatures] = useState<Features>({ circuit: "", year: 0, model:"" });
 
 
   const getFeatures = () => {

@@ -9,22 +9,6 @@ import { useState, useEffect } from 'react';
 import { useFeatures } from '../contexts/featuresContext';
 import { getPredictions } from "../apis/ui_options";
 
-function createData(
-  name: string,
-  place: number,
-  probability: number,
-) {
-
-  return { name, place, probability };
-}
-
-const rows = [
-  createData('George', 1, 97.5),
-  createData('Henry', 2, 95.0),
-  createData('Dave', 3, 93.4),
-  createData('Kevin', 4, 90.2),
-  createData('Pumperknickle', 5, 89.8),
-];
 
 export default function TimeTable() {
   //const [bundleData, setBundleData] = useState<BundleData | null>(null);
@@ -61,11 +45,7 @@ export default function TimeTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {driverProbabilities.map((driver, index) => {
-
-            const currentDriver = driverProbabilities.find(
-              (d) => d.start_position === index,
-            );
+          {driverProbabilities.slice(0, 20).map((driver, index) => {
             
             return (
               <TableRow key={index}
