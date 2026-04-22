@@ -90,7 +90,7 @@ export const getPredictions = async(): Promise<any[]> => {
 
 
 
-  predictionCache = await fetch("/data/f1_frontend_bundle.json")
+  predictionCache = await fetch("/data/f1_frontend_bundle_v5_full_predictions_and_metrics.json")
     .then(res => res.text())
     .then(text => JSON.parse(text.replace(/:\s*NaN/g, ": null")))
     .then(json => predictionCache = json)

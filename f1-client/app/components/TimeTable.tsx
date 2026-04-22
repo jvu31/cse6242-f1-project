@@ -7,7 +7,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
 import { useFeatures } from '../contexts/featuresContext';
-import { getPredictions } from "../apis/ui_options";
+import { getPredictions, getModels, Model } from "../apis/ui_options";
 
 
 export default function TimeTable() {
@@ -16,9 +16,11 @@ export default function TimeTable() {
   // New variables here
   const [data, setData] = useState<any>();
   const [driverProbabilities, setDriverProbabilities] = useState<any[]>([]);
+  const [models, setModels] = useState<Model[]>([]);
 
   useEffect(() => {
     getPredictions().then((data) => setData(data));
+    getModels().then((data) => setModels(data));
   }, []);
 
   useEffect(() => {
@@ -27,10 +29,14 @@ export default function TimeTable() {
       (r: any) =>
         r.circuit_name === features.circuit && r.year === features.year,
     )
-    .sort((a: any, b: any) => b.podium_probability - a.podium_probability);
+    .sort((a: any, b: any) => {
+      const aProb = a.predictions?.[features.model] ?? -Infinity;
+      const bProb = b.predictions?.[features.model] ?? -Infinity;
+      return bProb - aProb;
+    });
     setDriverProbabilities(drivers);
     //console.log("drivers", drivers);
-  }, [data, features.circuit, features.year]);
+  }, [data, features.circuit, features.year, features.model]);
 
   return (
     <TableContainer component={Paper}>
@@ -55,7 +61,7 @@ export default function TimeTable() {
                   {index+1}
                 </TableCell>
                 <TableCell align="left">{driver.driver_name}</TableCell>
-                <TableCell align="left">{driver.podium_probability}</TableCell>
+                <TableCell align="left">{(driver.predictions?.[features.model] * 100).toFixed(2) ?? null}</TableCell>
                 <TableCell align="left">{driver.finish_position}</TableCell>
                 <TableCell align="left">{index-  driver.finish_position + 1}</TableCell>
               </TableRow>

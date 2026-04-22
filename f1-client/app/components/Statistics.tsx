@@ -5,6 +5,16 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { useState, useEffect } from 'react';
+import { useFeatures } from '../contexts/featuresContext';
+import { getPredictions, getModels, Model } from "../apis/ui_options";
+
+interface StatRow {
+  name: string;
+  stat: number;
+  range: string;
+  desc: string;
+}
 
 function createData(
   name: string,
@@ -15,18 +25,78 @@ function createData(
   return { name, stat, range, desc };
 }
 
-const rows = [
-  createData('ROC AUC', 0.932, '0.5-1.0', 'ROC AUC: Reciever Operating Characteristic - Area Under Curve. 1.0 = Perfect Model, 0.5 = Random Guessing'),
-  createData('F1 Score', 0.620, '0.0-1.0', '0.8-0.9 is considered "good"'),
-  createData('Average Precision', 0.679, '0.0-1.0', 'A higher score indicates better model performance'),
-  createData('Recall', 0.901, '0.0-1.0', 'Ability for model to predict all true positives, where 1.0 indicates all true positives are identified'),
-];
 
 export default function AccessibleTable() {
+  const { features } = useFeatures()
+  // New variables here
+  const [data, setData] = useState<any>();
+  const [modelStats, setModelStats] = useState<any | null>(null)
+  const [models, setModels] = useState<Model[]>([]);
+  const [statRows, setStatRows] = useState<StatRow[]>([]);
+
+  useEffect(() => {
+    getPredictions().then((data) => setData(data));
+    getModels().then((data) => setModels(data));
+  }, []);
+
+  // const bProb = b.predictions?.[features.model] ?? -Infinity;
+
+  useEffect(() => {
+    if (!data) return;
+
+    const stats = data.model_metrics?.[features.model] ?? null;
+
+    setModelStats(stats);
+    console.log("stats", stats);
+    console.log("modelStats VALUE:", modelStats);
+    console.log("modelStats is array?", Array.isArray(modelStats));
+
+  }, [data, features.model]);
+
+  useEffect(() => {
+    if (!modelStats) return;
+
+    setStatRows([
+    createData(
+      "Accuracy",
+      modelStats.threshold_row_metrics.accuracy.toFixed(2),
+      "0.0–1.0",
+      "Quality of being correct"
+      ),
+    createData(
+      "Average Precision",
+      modelStats.threshold_row_metrics.average_precision.toFixed(2),
+      "0.0–1.0",
+      "A higher score indicates better model performance"
+      ),
+    createData(
+      "ROC AUC",
+      modelStats.threshold_row_metrics.roc_auc.toFixed(2),
+      "0.5–1.0",
+      "ROC AUC: Receiver Operating Characteristic - Area Under Curve. 1.0 = Perfect Model, 0.5 = Random Guessing"
+      ),
+    createData(
+      "F1 Score",
+      modelStats.threshold_row_metrics.f1.toFixed(2),
+      "0.0–1.0",
+      '0.8–0.9 is considered "good"'
+      ),
+    createData(
+      "Recall",
+      modelStats.threshold_row_metrics.recall.toFixed(2),
+      "0.0–1.0",
+      "Ability for model to predict all true positives"
+      ),
+    ]);
+  }, [modelStats]);
+
+
+
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="caption table">
-        <caption>Model summary is based off of [INSERT ASSUMPTIONS]</caption>
+        <caption>Prefered model is XGBoost without PCA</caption>
         <TableHead>
           <TableRow>
             <TableCell align="left">Statistic Name</TableCell>
@@ -36,7 +106,7 @@ export default function AccessibleTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {statRows.map((row) => (
             <TableRow key={row.name}>
               <TableCell component="th" scope="row">
                 {row.name}

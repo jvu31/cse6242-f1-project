@@ -28,10 +28,9 @@ export const FeaturesProvider = ({ children }: { children: React.ReactNode }) =>
     return features;
   }
 
+
+
   
-
-
-
   return (
     <FeaturesContext.Provider value={{ features, setFeatures, getFeatures}}>
       {children}

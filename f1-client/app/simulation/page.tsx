@@ -36,7 +36,7 @@ export default function Simulator() {
   }, []);
 
   useEffect(() => {
-    if (selectedCircuit === "" || selectedYear === "") {
+    if (selectedCircuit === "" || selectedYear === "" || selectedModel === "") {
       setIsValid(false);
       return;
     }
@@ -50,7 +50,7 @@ export default function Simulator() {
     } else {
       setIsValid(false);
     }
-  }, [selectedYear, selectedCircuit]);
+  }, [selectedYear, selectedCircuit, selectedModel]);
 
   return (
     <div
