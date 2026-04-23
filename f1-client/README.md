@@ -6,4 +6,5 @@
 5. Run 'npm run dev'
 6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+Site is deployed on https://cse6242-f1-project.vercel.app/
 
