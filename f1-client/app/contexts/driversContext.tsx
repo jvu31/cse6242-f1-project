@@ -5,18 +5,25 @@ import { Driver } from "../apis/ui_options";
 
 interface DriversContextType {
   drivers: Record<number, Driver>;
+  driverStats: Record<number, any>;
   addDriverToList: (driver: Driver, index: number) => void;
+  setAllDrivers: (drivers: Record<number, Driver>) => void;
+  setAllDriverStats: (stats: Record<number, any>) => void;
   getDrivers: () => Record<number, Driver>;
 }
 
 const DriversContext = createContext<DriversContextType>({
   drivers: {},
+  driverStats: {},
   addDriverToList: () => {},
+  setAllDrivers: () => {},
+  setAllDriverStats: () => {},
   getDrivers: () => ({})
 });
 
 export const DriversProvider = ({ children }: { children: React.ReactNode }) => {
   const [drivers, setDrivers] = useState<Record<number, Driver>>({});
+  const [driverStats, setDriverStats] = useState<Record<number, any>>({});
 
   const getDrivers = () => {
     return drivers;
@@ -29,8 +36,16 @@ export const DriversProvider = ({ children }: { children: React.ReactNode }) => 
     }));
   }
 
+  const setAllDrivers = (newDrivers: Record<number, Driver>) => {
+    setDrivers(newDrivers);
+  }
+
+  const setAllDriverStats = (stats: Record<number, any>) => {
+    setDriverStats(stats);
+  }
+
   return (
-    <DriversContext.Provider value={{ drivers, addDriverToList, getDrivers }}>
+    <DriversContext.Provider value={{ drivers, driverStats, addDriverToList, setAllDrivers, setAllDriverStats, getDrivers }}>
       {children}
     </DriversContext.Provider>
   );

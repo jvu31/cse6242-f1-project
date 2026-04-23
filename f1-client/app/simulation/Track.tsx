@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getPredictions } from "../apis/ui_options";
 import { useFeatures } from "../contexts/featuresContext";
+import { getGridPositionColor } from "../utils/gridColors";
 //import { useDrivers } from "../contexts/driversContext";
 
 interface GridTrack {
@@ -130,10 +131,7 @@ export default function Track({
               (d) => d.start_position === gridTrack.grid_position,
             );
 
-            const t = (gridTrack.grid_position - 1) / 19;
-            const hue = 120 * (1 - t);
-            const lightness = 60 - 15 * t;
-            const circleColor = `hsl(${hue}, 85%, ${lightness}%)`;
+            const circleColor = getGridPositionColor(gridTrack.grid_position);
 
             return (
               <div key={gridTrack.grid_position}>
