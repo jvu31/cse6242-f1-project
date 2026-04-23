@@ -9,9 +9,10 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { getCircuits, Circuit } from "../apis/ui_options";
+import { getCircuits, getDrivers, Circuit, Driver } from "../apis/ui_options";
 import { Button } from "@mui/material";
 import { useFeatures } from "../contexts/featuresContext";
+import { useDrivers } from "../contexts/driversContext";
 import Track from "./Track";
 import { getPredictions } from "../apis/ui_options";
 
@@ -20,11 +21,30 @@ export default function Simulator() {
   const [selectedCircuit, setSelectedCircuit] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<number | "">("");
   const { setFeatures, getFeatures } = useFeatures();
+  const { setAllDrivers, setAllDriverStats } = useDrivers();
   const [simulationCount, setSimulationCount] = useState(0);
   const [bundle, setBundle] = useState<any>();
   const [isValid, setIsValid] = useState(false);
 
   const [type, setType] = useState("simulation");
+
+  const populateDriversFromRace = async (circuit: string, year: number) => {
+    const allDrivers = await getDrivers();
+    const races = bundle?.historical_records.filter(
+      (r: any) => r.circuit_name === circuit && r.year === year,
+    ) ?? [];
+    const driverMap: Record<number, Driver> = {};
+    const statsMap: Record<number, any> = {};
+    races.forEach((record: any) => {
+      const driver = allDrivers.find((d) => d.driverId === record.driverId);
+      if (driver && record.start_position >= 1 && record.start_position <= 20) {
+        driverMap[record.start_position] = driver;
+        statsMap[record.start_position] = record;
+      }
+    });
+    setAllDrivers(driverMap);
+    setAllDriverStats(statsMap);
+  };
 
   useEffect(() => {
     getCircuits().then((data) => setCircuits(data));
@@ -135,6 +155,7 @@ export default function Simulator() {
                     });
                     setSimulationCount((c) => c + 1);
                     setType("real");
+                    populateDriversFromRace(selectedCircuit, selectedYear as number);
                   }}
                 >
                   Real Results
@@ -150,6 +171,7 @@ export default function Simulator() {
                     });
                     setSimulationCount((c) => c + 1);
                     setType("simulation");
+                    populateDriversFromRace(selectedCircuit, selectedYear as number);
                   }}
                 >
                   Simulated Results
@@ -171,7 +193,7 @@ export default function Simulator() {
           overflow: "hidden",
         }}
       >
-        <h2 className="text-2xl font-bold mb-4">Select Driver</h2>
+        <h2 className="text-2xl font-bold mb-4">Grid Position</h2>
 
         {/* Grid List */}
         <DriverGrid />
