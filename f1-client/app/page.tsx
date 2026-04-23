@@ -40,13 +40,13 @@ export default function Home() {
         </div>
 
         {/* Simulator */}
-        <section ref={simulatorSection} className="w-full">
+        <section ref={simulatorSection} className="w-full py-4">
           <Simulator />
         </section>
 
       
         {/* Analytics */}
-        <section ref={analyticsSection} className="w-full">
+        <section ref={analyticsSection} className="w-full py-4">
           <Analytics />
         </section>
 
