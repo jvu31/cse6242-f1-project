@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getPredictions } from "../apis/ui_options";
 import { useFeatures } from "../contexts/featuresContext";
 import { getGridPositionColor } from "../utils/gridColors";
@@ -56,9 +56,12 @@ export default function Track({
   const { features } = useFeatures();
   //const { drivers } = useDrivers();
 
-  const [driverProbabilities, setDriverProbabilities] = useState<any[]>([]);
-
-  //const [joinedData, setJoinedData] = useState<any[]>([])
+  const driverProbabilities = useMemo(() => {
+    if (!data) return [];
+    return data.historical_records.filter(
+      (r: any) => r.circuit_name === features.circuit && r.year === features.year,
+    );
+  }, [data, features.circuit, features.year]);
 
   const [tooltip, setTooltip] = useState<{
     name: string;
@@ -71,16 +74,6 @@ export default function Track({
   useEffect(() => {
     getPredictions().then((data) => setData(data));
   }, []);
-
-  useEffect(() => {
-    if (!data) return;
-    const drivers = data.historical_records.filter(
-      (r: any) =>
-        r.circuit_name === features.circuit && r.year === features.year,
-    );
-    setDriverProbabilities(drivers);
-    //console.log("drivers", drivers);
-  }, [data, features.circuit, features.year]);
 
   /*
   useEffect(() => {
@@ -128,8 +121,19 @@ export default function Track({
             const isOdd = gridTrack.grid_position % 2 !== 0;
 
             const currentDriver = driverProbabilities.find(
-              (d) => d.start_position === gridTrack.grid_position,
+              (d: any) => d.start_position === gridTrack.grid_position,
             );
+
+            const podiumProbability: number =
+              currentDriver?.predictions?.[features.model] ?? 0.5;
+
+            const animationScore = currentDriver
+              ? type === "simulation"
+                ? podiumProbability
+                : (20 - currentDriver.finish_position) / 19
+              : 0;
+
+            const duration = 60 * (2 - animationScore);
 
             const circleColor = getGridPositionColor(gridTrack.grid_position);
 
@@ -159,17 +163,8 @@ export default function Track({
                       stroke="rgba(255,255,255,0.7)"
                       strokeLinecap="round"
                       initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 || 0 }}
-                      transition={{
-                        duration:
-                          60 *
-                          (currentDriver
-                            ? 2 -
-                              (type === "simulation"
-                                ? currentDriver.podium_probability
-                                : (20 - currentDriver.finish_position) / 19)
-                            : 1),
-                      }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration }}
                     />
 
                     {/* Tracking circle */}
@@ -186,22 +181,13 @@ export default function Track({
                       }}
                       initial={{ offsetDistance: "0%" }}
                       animate={{ offsetDistance: "100%" }}
-                      transition={{
-                        duration:
-                          60 *
-                          (currentDriver
-                            ? 2 -
-                              (type === "simulation"
-                                ? currentDriver.podium_probability
-                                : (20 - currentDriver.finish_position) / 19)
-                            : 1),
-                      }}
+                      transition={{ duration }}
                       onMouseEnter={(e) => {
                         if (!currentDriver) return;
                         setTooltip({
                           name: currentDriver.driver_name,
                           grid: currentDriver.start_position,
-                          probability: currentDriver.podium_probability,
+                          probability: podiumProbability,
                           x: e.clientX,
                           y: e.clientY,
                         });

@@ -18,6 +18,7 @@ import Link from "next/link";
 
 import Tooltip from "@mui/material/Tooltip";
 import { useDrivers } from "../contexts/driversContext";
+import { useFeatures } from "../contexts/featuresContext";
 import { getGridPositionColor } from "../utils/gridColors";
 
 const fmt = (v: number | null, decimals = 1) =>
@@ -25,8 +26,10 @@ const fmt = (v: number | null, decimals = 1) =>
 
 const DriverCard = ({ index }: { index: number }) => {
   const { drivers, driverStats, addDriverToList } = useDrivers();
+  const { features } = useFeatures();
   const driver = drivers[index] ?? null;
   const stats = driverStats[index] ?? null;
+  const podiumProbability: number | null = stats?.predictions?.[features.model] ?? null;
 
   const [open, setOpen] = React.useState(false);
 
@@ -54,7 +57,7 @@ const DriverCard = ({ index }: { index: number }) => {
                   <div>#{driver.number} · {driver.nationality}</div>
                   <hr style={{ opacity: 0.3, margin: "4px 0" }} />
                   <div>Grid: {stats.start_position} → Finish: {stats.finish_position}</div>
-                  <div>Podium probability: {fmt(stats.podium_probability * 100)}%</div>
+                  <div>Podium probability: {fmt(podiumProbability != null ? podiumProbability * 100 : null)}%</div>
                   {stats.driver_prev_podium_rate != null && (
                     <div>Career podium rate: {fmt(stats.driver_prev_podium_rate * 100)}%</div>
                   )}
