@@ -16,10 +16,17 @@ import TextField from "@mui/material/TextField";
 
 import Link from "next/link";
 
+import Tooltip from "@mui/material/Tooltip";
 import { useDrivers } from "../contexts/driversContext";
+import { getGridPositionColor } from "../utils/gridColors";
+
+const fmt = (v: number | null, decimals = 1) =>
+  v != null ? v.toFixed(decimals) : "—";
 
 const DriverCard = ({ index }: { index: number }) => {
-  const [driver, setDriver] = useState<Driver | null>(null);
+  const { drivers, driverStats, addDriverToList } = useDrivers();
+  const driver = drivers[index] ?? null;
+  const stats = driverStats[index] ?? null;
 
   const [open, setOpen] = React.useState(false);
 
@@ -28,29 +35,62 @@ const DriverCard = ({ index }: { index: number }) => {
   };
 
   const handleSelectDriver = (selectedDriver: Driver) => {
-    setDriver(selectedDriver);
     setOpen(false);
     addDriverToList(selectedDriver, index);
   };
-
-  const { addDriverToList } = useDrivers();
 
   return (
     <div>
       <div>{index}</div>
       {driver ? (
         <div className="justify-center items-center flex flex-col gap-2">
-          <Image
-            src="/car.png"
-            alt="car"
-            width={100}
-            height={100}
-            className="brightness-0 invert"
-          />
+          <Tooltip
+            arrow
+            placement="left"
+            title={
+              stats ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 13 }}>
+                  <div><strong>{driver.forename} {driver.surname}</strong></div>
+                  <div>#{driver.number} · {driver.nationality}</div>
+                  <hr style={{ opacity: 0.3, margin: "4px 0" }} />
+                  <div>Grid: {stats.start_position} → Finish: {stats.finish_position}</div>
+                  <div>Podium probability: {fmt(stats.podium_probability * 100)}%</div>
+                  {stats.driver_prev_podium_rate != null && (
+                    <div>Career podium rate: {fmt(stats.driver_prev_podium_rate * 100)}%</div>
+                  )}
+                  {stats.driver_prev_avg_finish != null && (
+                    <div>Career avg finish: {fmt(stats.driver_prev_avg_finish)}</div>
+                  )}
+                  {stats.driver_last5_avg_points != null && (
+                    <div>Last 5 races avg pts: {fmt(stats.driver_last5_avg_points)}</div>
+                  )}
+                </div>
+              ) : ""
+            }
+          >
+            <div
+              style={{
+                backgroundColor: getGridPositionColor(index),
+                borderRadius: "8px",
+                padding: "8px",
+                display: "inline-flex",
+                cursor: "pointer",
+              }}
+            >
+              <Image
+                src="/car.png"
+                alt="car"
+                width={100}
+                height={100}
+                style={{ filter: "brightness(0)" }}
+              />
+            </div>
+          </Tooltip>
           <Chip label={driver.forename + " " + driver.surname} color="accent" />
         </div>
       ) : (
         <div className="justify-center items-center flex flex-col gap-2">
+          {/*}
           <Button
             onClick={() => setOpen(true)}
             color="secondary"
@@ -58,7 +98,7 @@ const DriverCard = ({ index }: { index: number }) => {
             sx={{ borderRadius: "50%", minWidth: "56px", height: "56px" }}
           >
             <AddIcon />
-          </Button>
+          </Button>*/}
           <Chip label="Add Driver" color="primary" variant="outlined" />
         </div>
       )}
