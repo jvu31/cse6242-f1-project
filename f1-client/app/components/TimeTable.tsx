@@ -1,3 +1,5 @@
+"use client";
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -7,7 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
 import { useFeatures } from '../contexts/featuresContext';
-import { getPredictions, getModels, Model } from "../apis/ui_options";
+import { getPredictions } from "../apis/ui_options";
 
 
 export default function TimeTable() {
@@ -16,11 +18,9 @@ export default function TimeTable() {
   // New variables here
   const [data, setData] = useState<any>();
   const [driverProbabilities, setDriverProbabilities] = useState<any[]>([]);
-  const [models, setModels] = useState<Model[]>([]);
 
   useEffect(() => {
     getPredictions().then((data) => setData(data));
-    getModels().then((data) => setModels(data));
   }, []);
 
   useEffect(() => {

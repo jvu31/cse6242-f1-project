@@ -1,3 +1,5 @@
+"use client";
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -7,7 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
 import { useFeatures } from '../contexts/featuresContext';
-import { getPredictions, getModels, Model } from "../apis/ui_options";
+import { getPredictions } from "../apis/ui_options";
 
 interface StatRow {
   name: string;
@@ -31,12 +33,10 @@ export default function AccessibleTable() {
   // New variables here
   const [data, setData] = useState<any>();
   const [modelStats, setModelStats] = useState<any | null>(null)
-  const [models, setModels] = useState<Model[]>([]);
   const [statRows, setStatRows] = useState<StatRow[]>([]);
 
   useEffect(() => {
     getPredictions().then((data) => setData(data));
-    getModels().then((data) => setModels(data));
   }, []);
 
   // const bProb = b.predictions?.[features.model] ?? -Infinity;

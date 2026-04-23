@@ -1,3 +1,5 @@
+"use client";
+
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useState, useEffect } from 'react';
 import { useFeatures } from '../contexts/featuresContext';

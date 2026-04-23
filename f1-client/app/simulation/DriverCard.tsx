@@ -1,7 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
 import Chip from "@mui/material/Chip";
 import Drawer from "@mui/material/Drawer";
 import React from "react";
@@ -109,10 +110,12 @@ const DriverCard = ({ index }: { index: number }) => {
         anchor="right"
         open={open}
         onClose={toggleDrawer(false)}
-        PaperProps={{
-          sx: {
-            width: "40.33%",
-            backgroundColor: "base.100",
+        slotProps={{
+          paper: {
+            sx: {
+              width: "40.33%",
+              backgroundColor: "base.100",
+            },
           },
         }}
       >

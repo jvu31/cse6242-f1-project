@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Grid, Button } from "@mui/material";
 import Stack from '@mui/material/Stack';
 import { ThemeProvider } from "@mui/material/styles";
