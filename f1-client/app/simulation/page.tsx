@@ -9,7 +9,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { getCircuits, getDrivers, Circuit, Driver } from "../apis/ui_options";
+import { getCircuits, Circuit, getModels, Model, getDrivers, Driver } from "../apis/ui_options";
 import { Button } from "@mui/material";
 import { useFeatures } from "../contexts/featuresContext";
 import { useDrivers } from "../contexts/driversContext";
@@ -18,13 +18,16 @@ import { getPredictions } from "../apis/ui_options";
 
 export default function Simulator() {
   const [circuits, setCircuits] = useState<Circuit[]>([]);
+  const [models, setModels] = useState<Model[]>([]);
   const [selectedCircuit, setSelectedCircuit] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<number | "">("");
   const { setFeatures, getFeatures } = useFeatures();
   const { setAllDrivers, setAllDriverStats } = useDrivers();
   const [simulationCount, setSimulationCount] = useState(0);
   const [bundle, setBundle] = useState<any>();
   const [isValid, setIsValid] = useState(false);
+  
 
   const [type, setType] = useState("simulation");
 
@@ -49,10 +52,11 @@ export default function Simulator() {
   useEffect(() => {
     getCircuits().then((data) => setCircuits(data));
     getPredictions().then((data) => setBundle(data));
+    getModels().then((data) => setModels(data));
   }, []);
 
   useEffect(() => {
-    if (selectedCircuit === "" || selectedYear === "") {
+    if (selectedCircuit === "" || selectedYear === "" || selectedModel === "") {
       setIsValid(false);
       return;
     }
@@ -66,7 +70,7 @@ export default function Simulator() {
     } else {
       setIsValid(false);
     }
-  }, [selectedYear, selectedCircuit]);
+  }, [selectedYear, selectedCircuit, selectedModel]);
 
   return (
     <div
@@ -141,6 +145,30 @@ export default function Simulator() {
                     </Select>
                   </FormControl>
                 </Box>
+
+                <Box sx={{ minWidth: 120 }}>
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">
+                      Models
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={selectedModel}
+                      label="Model"
+                      onChange={(event) =>
+                        setSelectedModel(event.target.value as string)
+                      }
+                    >
+                      {models.map((model) => (
+                        <MenuItem key={model.modelID} value={model.name_long}>
+                          {model.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+
               </div>
               {/* Buttons */}
               <div className="flex flex-row gap-4">
@@ -152,6 +180,7 @@ export default function Simulator() {
                     setFeatures({
                       circuit: selectedCircuit,
                       year: selectedYear as number,
+                      model: selectedModel,
                     });
                     setSimulationCount((c) => c + 1);
                     setType("real");
@@ -168,6 +197,7 @@ export default function Simulator() {
                     setFeatures({
                       circuit: selectedCircuit,
                       year: selectedYear as number,
+                      model: selectedModel,
                     });
                     setSimulationCount((c) => c + 1);
                     setType("simulation");

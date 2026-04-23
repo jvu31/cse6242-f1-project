@@ -24,9 +24,16 @@ export interface Circuit {
   url: string;
 }
 
+export interface Model {
+  modelID: number;
+  name: string;
+  name_long: string;
+}
+
 let driversCache: Driver[] | null = null;
 let circuitCache: Circuit[] | null = null;
-let predictionCache: any[] | null = null
+let predictionCache: any[] | null = null;
+let modelCache: Model[] | null = null;
 
 export const getDrivers = async (): Promise<Driver[]> => {
   if (driversCache) return driversCache;
@@ -83,10 +90,22 @@ export const getPredictions = async(): Promise<any[]> => {
 
 
 
-  predictionCache = await fetch("/data/f1_frontend_bundle.json")
+  predictionCache = await fetch("/data/f1_frontend_bundle_v5_full_predictions_and_metrics.json")
     .then(res => res.text())
     .then(text => JSON.parse(text.replace(/:\s*NaN/g, ": null")))
     .then(json => predictionCache = json)
 
   return predictionCache!;
+}
+
+export const getModels = async(): Promise<Model[]> => {
+  if (modelCache) return modelCache
+
+  modelCache = [
+    {modelID: 1, name: "Logistic Regression", name_long: "logistic_regression_feature_set_a"},
+    {modelID: 2, name: "Logistic Regression w/PCA", name_long: "logistic_regression_feature_set_a_with_pca"},
+    {modelID: 3, name: "XG Boost", name_long: "xgboost_feature_set_a"},
+    {modelID: 4, name: "XG Boost w/PCA", name_long: "xgboost_feature_set_a_with_pca"}
+  ]
+  return modelCache
 }
