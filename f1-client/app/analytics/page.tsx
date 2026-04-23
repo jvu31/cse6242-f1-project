@@ -43,24 +43,25 @@ export default function Analytics() {
 
   return (
     <>
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+        <Grid 
+          container 
+          rowSpacing={1} 
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          sx={{
+            justifyContent: "center",
+            alignItems: "flex-end",
+          }}
+          >
             <Grid size={6}>
                 <Podium/>
             </Grid>
             <Grid size={6}>
-                <CoefficintMatrix/>
-            </Grid>
-            <Grid size={6}>
-                <TimeTable/>
-            </Grid>
-            <Grid size={6}>
                 <Statistics/>
             </Grid>
+            <Grid size={12}>
+                <TimeTable/>
             </Grid>
-    
-    
-    
-    
+        </Grid>
     </>
 
     

@@ -70,5 +70,6 @@ export default function TimeTable() {
         </TableBody>
       </Table>
     </TableContainer>
+    
   );
 }

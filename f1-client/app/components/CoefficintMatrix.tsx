@@ -1,4 +1,13 @@
 import { BarChart } from '@mui/x-charts/BarChart';
+import { useState, useEffect } from 'react';
+import { useFeatures } from '../contexts/featuresContext';
+import { getPredictions, getModels, Model } from "../apis/ui_options";
+
+interface BarData {
+  feature: string,
+  coeff: number,
+  absCoeff: number
+}
 
 
 function createData(
@@ -35,6 +44,30 @@ const coefficients = [
 
 
 export default function CoefficientMatrix() {
+  const { features } = useFeatures()
+  // New variables here
+  const [data, setData] = useState<any>();
+  const [modelStats, setModelStats] = useState<any | null>(null)
+  const [models, setModels] = useState<Model[]>([]);
+  const [barData, setBarData] = useState<BarData[]>([]);
+
+  useEffect(() => {
+    getPredictions().then((data) => setData(data));
+    getModels().then((data) => setModels(data));
+  }, []);
+
+  useEffect(() => {
+    if (!data) return;
+
+    const stats = data.model_metrics?.[features.model] ?? null;
+
+    setModelStats(stats);
+    console.log("stats", stats);
+    console.log("modelStats VALUE:", modelStats);
+    console.log("modelStats is array?", Array.isArray(modelStats));
+
+  }, [data, features.model]);
+
   return (
     <BarChart
       dataset={coefficients}
